@@ -1,3 +1,6 @@
+// HALO frontend API client.
+// Handles communication between React and the FastAPI backend.
+
 import type {
     HealthResponse,
     AstronautListResponse,
@@ -50,10 +53,8 @@ async function request<T>(
                     'Content-Type': 'application/json',
                     ...options.headers,
                 },
-            }
-        )
-    } 
-    catch {
+            })
+        } catch {
         // Report connection failures without claiming success
         throw new ApiError(
         0,
@@ -62,6 +63,7 @@ async function request<T>(
         )
     }
 
+    // Handle unsuccessful HTTP responses from the backend.
     if (!response.ok) {
         let code = 'API_ERROR'
         let message = `Request failed (${response.status}).`
@@ -72,14 +74,14 @@ async function request<T>(
             code = data.error.code ?? code
             message = data.error.message ?? message
             }
-        } 
-        catch {
+        } catch {
         // Keep the default message if the response is invalid
         }
 
         throw new ApiError(response.status, code, message)
     }
 
+    // Return the successful response using the expected TypeScript type.
     return (await response.json()) as T
 }
 
@@ -88,22 +90,22 @@ const astronautPath = (id: string) => `/astronauts/${encodeURIComponent(id)}`
 
 // API endpoints
 export const haloApi = {
-    //Check FastAPI availability
+    // Check FastAPI availability
     health: () => request<HealthResponse>('/health'),
 
     // Retrieve available astronauts
     astronauts: () => request<AstronautListResponse>('/astronauts'),
-    // Retrieve available personal baselines
+    // Retrieve the selected astronaut's personal health baselines.
     baseline: (id: string) => request<BaselineResponse>(
          `${astronautPath(id)}/baseline`,
     ),
 
-    //Retrieve health status for the selected mission
+    // Retrieve health status for the selected mission day
     status: (id: string, day: number) => request<AstronautStatus>(
         `${astronautPath(id)}/status?day=${day}`,
     ),
 
-    //Retrieve historical measurements and trends
+    // Retrieve historical measurements and trends
     trends: (
         id: string,
         metric: string,

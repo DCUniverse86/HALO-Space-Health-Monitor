@@ -1,5 +1,7 @@
+/* Load Tailwind CSS for HALO's styling utilities. */
 @import "tailwindcss";
 
+/* Apply HALO's Tinos typography throughout the application. */
 body {
     font-family: "Tinos", Georgia, serif;
 }
