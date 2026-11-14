@@ -1,6 +1,6 @@
-
 import { useEffect, useState } from 'react'
 import { haloApi } from './api/client'
+import Dashboard from './pages/Dashboard'
 
 function App() {
   const [status, setStatus] = useState('Checking connection...')
@@ -32,6 +32,9 @@ function App() {
 
       <div className="mt-8 rounded-xl bg-blue-800 px-8 py-4">
         {status}
+      </div>
+      <div className='mt-8 w-full max-w-6xl'>
+        <Dashboard />
       </div>
     </main>
   )
