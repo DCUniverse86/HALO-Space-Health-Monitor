@@ -147,3 +147,54 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.pytest/cache/
+.mypy_cache/
+.ruff_cache/
+.coverage/
+*.eggs_info/
+.eggs/
+
+# Local database
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated data
+data/raw/
+data/simulated/
+backend/data/raw/
+backend/data/simulated/
+
+# AI Generated database
+chroma
+chroma_db
+chroma_data/
+*.faiss
+*.index
+
+# Additional Secrets
+*.pem
+*.key
+!.env.*example
+
+# Editors and Operating System
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary and Deployment files
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+.terraform/
