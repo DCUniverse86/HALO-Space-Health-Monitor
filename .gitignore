@@ -198,3 +198,6 @@ Desktop.ini
 *.swo
 *.bak
 .terraform/
+
+backend/data/checkins.json
+backend/data/escalations.json
