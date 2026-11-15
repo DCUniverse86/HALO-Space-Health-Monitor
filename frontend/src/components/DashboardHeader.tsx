@@ -67,12 +67,12 @@ function DashboardHeader({
                         <img
                             src="/robot_face.png"
                             alt="HALO robot"
-                            className='h-40 w-40 shrink-0 object-contain sm:h-52 sm:w-52'
+                            className='h-40 w-40 shrink-0 object-contain sm:h-52 sm:w-52 lg:h-64 lg:w-64'
                         />
                     
-                    {/* Display health status without inventing AI recommendations*/}
-                    <div className="min-w-0 flex-1">
-                        <span className={`text-2xl font-bold ${severityColor}`}>
+                    {/* Display health status and AI assessment beside HALO */}
+                    <div className="min-w-0 flex-1 space-y-3">
+                        <span className={`text-2xl font-bold sm:text-3xl${severityColor}`}>
                             {overallSeverity ?? "Unavailable"}
                         </span>
 
