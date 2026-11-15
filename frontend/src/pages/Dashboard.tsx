@@ -56,7 +56,6 @@ function Dashboard({onStartCheckIn}: DashboardProps) {
                 missionDay={75}
                 overallSeverity={null}
                 isDemo={true}
-                aiStatus='unknown'
             />
             {isLoading ? (
             <p>Loading astronaut health data...</p>

@@ -1,5 +1,6 @@
 import { useState } from "react"
-import type { CheckInRequest } from "../types/api"
+import type { CheckInRequest, Severity } from "../types/api"
+import AssessmentResults from "../components/AssessmentResults"
 
 const symptomOptions = ["Fatigue", "Headache", "Back Pain", "Fever", "None"]
 const sleepOptions = [
@@ -20,6 +21,7 @@ function DailyCheckIn() {
   const [formData, setFormData] = useState<Partial<CheckInRequest>>({})
   const [selectedSleep, setSelectedSleep] = useState<string | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
+  const [demoSeverity, setDemoSeverity] = useState<Severity>('GREEN')
   const [measurementContext, setMeasurementContext] = useState<"resting" | "after_activity">("resting")
   const [recordedAt, setRecordedAt] = useState("")
   const [vitals, setVitals] = useState<Vitals>(initialVitals)
@@ -64,6 +66,19 @@ function DailyCheckIn() {
 
   const isStepOneComplete =
     selectedSleep !== null && formData.mood != null && (formData.symptoms?.length ?? 0) > 0
+
+
+  // Reset this local demo after finishing the preview.
+  const finishCheckIn = () => {
+    setCurrentStep(1)
+    setFormData({})
+    setSelectedSleep(null)
+    setVitals({ ...initialVitals })
+    setMeasurementContext("resting")
+    setRecordedAt("")
+    setReadingsSaved(false)
+    setDemoSeverity("GREEN")
+  }
 
   // Input rows follow the uploaded HALO Application (8).png design.
   const vitalRow = (field: VitalKey, label: string, unit: string, max?: number) => (
@@ -241,6 +256,15 @@ function DailyCheckIn() {
             Cancel
           </button>
           {readingsSaved && (
+            <button
+              type="button"
+              onClick={() => setCurrentStep(3)}
+              className="mt-3 w-full rounded-full bg-[#F0B429] px-4 py-3 font-bold text-[#102B4C] hover:bg-[#FFD166]"
+            >
+              Continue to demo assessment
+            </button>
+          )}
+          {readingsSaved && (
             <p role="status" className="mt-2 text-center text-xs text-[#B9C9DD]">
               Readings retained in this session only. Not submitted to the backend.
             </p>
@@ -252,6 +276,42 @@ function DailyCheckIn() {
           </div>
         </>
       )}
+      {/* Display the Step 3 assessment preview. */}
+{currentStep === 3 && (
+    <div className="mx-auto w-full max-w-4xl">
+        {/* Switch between fictional assessment scenarios. */}
+        <div className="mb-6 rounded-2xl bg-[#173A6B] p-4">
+            <p className="mb-3 text-sm font-semibold text-white">
+                Demo Assessment Preview
+            </p>
+
+            <div className="flex flex-wrap gap-3">
+                {(['GREEN', 'YELLOW', 'RED'] as const).map(
+                    (severity) => (
+                        <button
+                            key={severity}
+                            type="button"
+                            onClick={() => setDemoSeverity(severity)}
+                            aria-pressed={demoSeverity === severity}
+                            className={`rounded-xl border px-5 py-3 font-semibold ${
+                                demoSeverity === severity
+                                    ? 'border-[#F0B429] bg-[#F0B429] text-[#102B4C]'
+                                    : 'border-[#A8BDD6] bg-[#1F4A85] text-white'
+                            }`}
+                        >
+                            {severity}
+                        </button>
+                    )
+                )}
+            </div>
+        </div>
+
+        <AssessmentResults
+            severity={demoSeverity}
+            onDone={finishCheckIn}
+        />
+    </div>
+)}
     </main>
   )
 }

@@ -5,8 +5,7 @@ interface DashboardHeaderProps {
     astronautName: string
     missionDay: number
     overallSeverity: Severity | null
-    isDemo: boolean
-    aiStatus: 'online' | 'offline' | 'unknown'    
+    isDemo: boolean    
 }
 
 // Displays astronaut information and overall mission status.
@@ -15,7 +14,6 @@ function DashboardHeader({
     missionDay,
     overallSeverity,
     isDemo,
-    aiStatus,
 } : DashboardHeaderProps) {
     // Select the text color for the overall health status    
     const severityColor = overallSeverity === 'GREEN' 
@@ -35,24 +33,6 @@ function DashboardHeader({
                         alt="HALO"
                         className='h-auto w-28 object-contain'
                     />
-                    <span className="flex items-center gap-2 rounded-full px-3 py-1 text-sm text-white">
-                        {/* Show the AI availability indicator */}
-                        <span
-                            className={`h-2.5 w-2.5 rounded-full ${
-                                aiStatus === 'online'
-                                    ? 'bg-[#4CC38A]'
-                                    :aiStatus === 'offline'
-                                    ? 'bg-[#F03333]'
-                                    : 'bg-gray-400'
-        }`}
-                            aria-hidden='true'
-                        />
-                        {aiStatus === 'online'
-                            ? "AI Online"
-                            :aiStatus === 'offline'
-                            ? "AI Offline"
-                            : 'AI Status unavailable'}
-                    </span>
                 </div>
 
                 {/* Astronauts information for the selected mission day*/}

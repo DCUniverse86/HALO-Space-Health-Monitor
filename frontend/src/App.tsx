@@ -6,6 +6,9 @@ import type { NavPage } from './components/BottomNav'
 import DailyCheckIn from './pages/DailyCheckIn'
 import Trends from './pages/Trends'
 import Profile from './pages/Profile'
+import Vitals from './pages/Vitals'
+import AIStatusIndicator from './components/AIStatusIndicator'
+import Escalation from './pages/Escalation'
 
 // Main HALO application component.
 function App() {
@@ -36,16 +39,26 @@ function App() {
             className="flex min-h-screen flex-col items-center bg-[url('/sky_stars_dark_phone.png')] bg-cover bg-center bg-fixed bg-no-repeat px-6 pt-6 pb-32 text-white md:bg-[url('/sky_stars_dark_wide.png')]"
         >
             <div className="w-full max-w-6xl">
-                {activePage === 'home' ? (
+                {/* Display AI availability on every HALO page. */}
+                <div className="mb-4 flex justify-end">
+                    <AIStatusIndicator status="unknown" />
+                </div>
+                
+                    {activePage === 'home' ? (
                     <Dashboard
                         onStartCheckIn={() => setActivePage('checkin')}
-                    />
+                />
+
+                ) : activePage === 'vitals' ? (
+                    <Vitals />
                 ) : activePage === 'checkin' ? (
                     <DailyCheckIn />
                 ) : activePage === 'trends' ? (
                     <Trends />
                 ) : activePage === 'profile' ? (
                     <Profile />
+                ) : activePage === 'escalation' ? (
+                    <Escalation onBack={() => setActivePage('chat')}/>
                 ) : (
                     <p className="mt-6 text-center">
                         {activePage.charAt(0).toUpperCase() + activePage.slice(1)} page coming soon.
