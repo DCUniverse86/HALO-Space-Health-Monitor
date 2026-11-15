@@ -37,7 +37,18 @@
                                 <LineChart data={data.points}>
                                     <CartesianGrid strokeDasharray="3 3"/>
                                     <XAxis dataKey="day" />
-                                    <YAxis />
+                                    <YAxis
+                                        domain={[
+                                            (dataMin: number) =>
+                                                Math.floor(Math.min(dataMin, data.baseline.lower) - 3),
+                                            (dataMax: number) =>
+                                                Math.ceil(Math.max(dataMax, data.baseline.upper) + 3),
+                                        ]}
+                                        tick={{ fill: '#FFFFFF', fontSize: 12 }}
+                                        axisLine={{ stroke: '#A8BDD6' }}
+                                        tickLine={{ stroke: '#A8BDD6' }}
+                                        width={45}
+                                    />
                                     <Tooltip />
                                     {/* Identify the measurement and trend lines. */}
                                     <Legend />
@@ -45,17 +56,38 @@
                                     <ReferenceLine
                                         y={data.baseline.median}
                                         stroke="#FFFFFF"
-                                        strokeDasharray="4 4"
+                                        strokeWidth={2}
+                                        strokeDasharray="6 4"
+                                        label={{
+                                            value: `Baseline: ${data.baseline.median} ${data.unit}`,
+                                            position: 'insideTopRight',
+                                            fill: '#FFFFFF',
+                                            fontSize: 12,
+                                        }}
                                     />
                                     <ReferenceLine
                                         y={data.baseline.lower}
                                         stroke="#A8BDD6"
-                                        strokeDasharray="3 3"
+                                        strokeWidth={2}
+                                        strokeDasharray="5 5"
+                                        label={{
+                                            value: `Lower: ${data.baseline.lower} ${data.unit}`,
+                                            position: 'insideBottomRight',
+                                            fill: '#A8BDD6',
+                                            fontSize: 11,
+                                        }}
                                     />
                                     <ReferenceLine
                                         y={data.baseline.upper}
                                         stroke="#A8BDD6"
-                                        strokeDasharray="3 3"
+                                        strokeWidth={2}
+                                        strokeDasharray="5 5"
+                                        label={{
+                                            value: `Upper: ${data.baseline.upper} ${data.unit}`,
+                                            position: 'insideTopRight',
+                                            fill: '#A8BDD6',
+                                                fontSize: 11,
+                                        }}
                                     />
                                     <Line
                                         type="monotone"                                    
@@ -69,11 +101,17 @@
                                         type="monotone"
                                         dataKey="ewma"
                                         name="EWMA Trend"
-                                        stroke="#F0B429"
-                                        strokeWidth={2}
-                                        strokeDasharray="3 3"
+                                        stroke="#FFD166"
+                                        strokeWidth={4}
+                                        dot={{
+                                            r: 4,
+                                            fill: '#FFD166',
+                                            stroke: '#102B4C',
+                                            strokeWidth: 2,
+                                        }}
+                                        activeDot={{ r: 7 }}
                                         connectNulls={false}
-                                    />
+                                        />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>

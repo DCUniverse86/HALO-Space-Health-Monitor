@@ -3,6 +3,7 @@ import type { BodySystem, Severity } from "../types/api"
 import { useState } from "react"
 import DashboardHeader from "../components/DashboardHeader"
 import TrendsChart from "../components/TrendsChart"
+import { demoTrends } from '../data/demoTrends'
 
 // Temporary health-system data for testing the Dashboard layout.
 const healthSystems:{
@@ -77,7 +78,7 @@ function Dashboard({onStartCheckIn}: DashboardProps) {
                 
                 {/* Displays health trends on the Home screen */}
                 <div className="mt-6 w-full">
-                    <TrendsChart data={null} />
+                    <TrendsChart data={demoTrends} />
                 </div>
 
                 {/* Start the astronaut's daily check-in */}

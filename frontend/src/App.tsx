@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import BottomNav from './components/BottomNav'
 import type { NavPage } from './components/BottomNav'
 import DailyCheckIn from './pages/DailyCheckIn'
+import Trends from './pages/Trends'
 
 // Main HALO application component.
 function App() {
@@ -40,6 +41,8 @@ function App() {
                     />
                 ) : activePage === 'checkin' ? (
                     <DailyCheckIn />
+                ) : activePage === 'trends' ? (
+                    <Trends />
                 ) : (
                     <p className="mt-6 text-center">
                         {activePage.charAt(0).toUpperCase() + activePage.slice(1)} page coming soon.
