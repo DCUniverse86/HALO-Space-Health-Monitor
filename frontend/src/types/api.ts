@@ -1,9 +1,10 @@
-/**
- * Shared frontend data types
- */
+// Shared frontend data types
+ 
 
+// Defines the three possible health severity levels.
 export type Severity = 'GREEN' | 'YELLOW' | 'RED'
 
+// Identifies HALO's five monitored health systems.
 export type BodySystem = 
     | 'cardiovascular'
     | 'immune'
@@ -11,11 +12,13 @@ export type BodySystem =
     | 'behavioral'
     | 'environment'
 
+    // Stores the severity and explanation for one health system.
 export interface SystemStatus {
     severity: Severity
     message: string
 }
 
+// Stores a health measurement and its baseline comparison.
 export interface MetricStatus {
     value: number | null
     unit: string
@@ -23,6 +26,7 @@ export interface MetricStatus {
     severity: Severity
 }
 
+// Describes a health concern detected by the backend.
 export interface HealthFlag {
     id: string
     system: BodySystem
@@ -31,6 +35,7 @@ export interface HealthFlag {
     explanation: string
 }
 
+// Contains an astronaut's health status for a selected mission day.
 export interface AstronautStatus {
     astronaut_id: string
     astronaut_name: string
@@ -41,26 +46,32 @@ export interface AstronautStatus {
     flags: HealthFlag[]
 }
 
+// Stores basic astronaut profile information.
 export interface Astronaut {
     id: string
     name: string
     mission: string
 }
 
+// Contains the astronaut profiles returned by the backend.
 export interface AstronautListResponse {
     astronauts: Astronaut[]
 }
 
+// Defines the baseline statistics for one health metric.
 export interface BaselineMetric {
     median: number
     scale: number
     unit: string
 }
+
+// Contains an astronaut's personal health baselines.
 export interface BaselineResponse {
     astronaut_id: string
     metrics: Record<string, BaselineMetric>
 }
 
+// Represents one measurement in a health trend.
 export interface TrendPoint {
     day: number
     value: number | null
@@ -68,6 +79,7 @@ export interface TrendPoint {
     severity: Severity
 }
 
+// Contains historical measurements and baseline boundaries.
 export interface TrendsResponse {
     astronaut_id: string
     metric: string
@@ -80,6 +92,7 @@ export interface TrendsResponse {
     points: TrendPoint[]
 }
 
+// Defines the information submitted during a daily check-in.
 export interface CheckInRequest {
     day: number
     sleep_quality: number
@@ -94,6 +107,7 @@ export interface CheckInRequest {
     notes: string
 }
 
+// Contains confirmation and any new flags from a check-in.
 export interface CheckInResponse {
     success: boolean
     checkin_id: string
@@ -101,18 +115,21 @@ export interface CheckInResponse {
     new_flags: HealthFlag[]
 }
 
+// Defines a message sent to HALO's AI assistant.   
 export interface AssistantRequest {
     day: number
     flag_id: string | null
     message: string
 }
 
+// Identifies a source supporting an assistant response.
 export interface AssistantSource {
     title: string
     source_id: string
     passage: string
 }
 
+// Contains the assistant's guidance, sources, and disclaimer.
 export interface AssistantResponse {
     summary: string
     severity: Severity
@@ -125,12 +142,14 @@ export interface AssistantResponse {
     disclaimer: string
 }
 
+// Defines a request to escalate a health concern.
 export interface EscalationRequest {
     day: number
     flag_id: string
     reason: string
 }
 
+// Contains the escalation report and communication status.
 export interface EscalationResponse {
     success: boolean
     report_id: string
@@ -140,10 +159,12 @@ export interface EscalationResponse {
     message: string
 }
 
+// Contains the backend health-check response.
 export interface HealthResponse {
     status: string
 }
 
+// Defines the standard API error response.
 export interface ApiErrorResponse {
     error: {
         code: string
