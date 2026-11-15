@@ -1,49 +1,23 @@
-import { useEffect, useState } from 'react'
-import { haloApi } from './api/client'
+import { useState } from 'react'
 import Dashboard from './pages/Dashboard'
 import BottomNav from './components/BottomNav'
 import type { NavPage } from './components/BottomNav'
+import DailyCheckIn from './pages/DailyCheckIn'
 
 // Main HALO application component.
 function App() {
-  // Store the current FastAPI connection status.
-  const [status, setStatus] = useState('Checking connection...')
   // Track which HALO page is currently selected
   const [activePage, setActivePage] = useState<NavPage>('home')
-
-  // Check backend availability when the application loads.
-  useEffect(() => {
-    // Verify communication with the FastAPI backend.
-    haloApi.health()
-      .then((data) => {
-        setStatus(
-          data.status === 'ok'
-            ? 'Connected to HALO backend'
-            : 'Unexpected backend response',
-        )
-      })
-      .catch(() => {
-        setStatus('Unable to connect to HALO backend')
-      })
-  }, [])
-
-  // Display the HALO heading, connection status, selected page, and navigation.
+  // Display the selected HALO page, and bottom navigation.
   return (
-    <main className="flex min-h-screen flex-col items-center bg-slate-950 px-6 pb-32 text-white">
-      <h1 className="text-5xl font-bold text-yellow-400">
-        HALO
-      </h1>
+    <main className="flex min-h-screen flex-col items-center bg-[url('/sky_stars_dark_phone.png')] 
+    bg-cover bg-center bg-fixed bg-no-repeat px-6 pt-6 pb-32 text-white md:bg-[url('/sky_stars_dark_wide.png')]">
 
-      <p className="mt-4 text-center">
-        Health Assessment & Longitudinal Observer
-      </p>
-
-      <div className="mt-8 rounded-xl bg-blue-800 px-8 py-4">
-        {status}
-      </div>
       <div className="mt-8 w-full max-w-6xl">
         {activePage === 'home' ? (
-          <Dashboard />
+          <Dashboard onStartCheckIn={() => setActivePage('checkin')}/>
+        ) : activePage === 'checkin' ? (
+          <DailyCheckIn />
         ) : (
           <p className="mt-6 text-center">
             {activePage.charAt(0).toUpperCase() + activePage.slice(1)} page coming soon.

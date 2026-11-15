@@ -1,5 +1,5 @@
 // Defines the four main HALO navigation destinations.
-export type NavPage = 'home' | 'trends' | 'chat' | 'profile'
+export type NavPage = 'home' | 'trends' | 'chat' | 'profile' | 'checkin'
 // Icons for HALO's main navigation tabs
 import { House, ChartNoAxesCombined, MessageCircle, UserRound } from "lucide-react"
 import type { LucideIcon } from "lucide-react"

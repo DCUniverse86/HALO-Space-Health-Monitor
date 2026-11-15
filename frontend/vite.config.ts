@@ -6,4 +6,9 @@ import tailwindcss from '@tailwindcss/vite'
 // Enable React support and Tailwind CSS processing.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    allowedHosts: [
+      'affecting-bikini-heater-accordingly.trycloudflare.com',
+    ],
+  },
 })
