@@ -1,6 +1,8 @@
-fastapi
-uvicorn[standard]
 numpy
 pandas
 pyyaml
 pytest
+fastapi[standard]
+uvicorn[standard]
+google-genai
+python-dotenv
