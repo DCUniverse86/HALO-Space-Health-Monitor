@@ -253,10 +253,6 @@ Contributors
 
 HALO was developed as a collaborative project, with each team member contributing to the design, development, and integration of the astronaut health-monitoring system.
 
-Contributor
-
-Role
-
 Contributions
 
 Donald Carpenter
