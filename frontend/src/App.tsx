@@ -98,6 +98,33 @@ function App() {
         }
     }, [])
 
+
+    // Check Gemini availability when HALO starts.
+    useEffect(() => {
+        let active = true
+
+        haloApi.aiStatus()
+            .then((response) => {
+                if (!active) return
+
+                setAiStatus(
+                    response.status === 'online'
+                        ? 'online'
+                        : 'offline'
+                )
+            })
+            .catch(() => {
+                if (active) {
+                    setAiStatus('unknown')
+                }
+            })
+
+        return () => {
+            active = false
+        }
+    }, [])
+
+
     // Check backend availability.
     useEffect(() => {
         let active = true

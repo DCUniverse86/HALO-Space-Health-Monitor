@@ -155,3 +155,32 @@ def health_check():
     return {
         "status": "ok",
     }
+
+# Check Gemini availability without modifying health data.
+@app.get("/ai/status")
+async def ai_status():
+    from app.config import GEMINI_API_KEY
+
+    if not GEMINI_API_KEY:
+        return {
+            "status": "offline",
+            "mode": "offline_rules",
+        }
+
+    try:
+        from app.ai.index import ask_gemini
+
+        await ask_gemini(
+            "Provide a brief general wellness reminder."
+        )
+
+        return {
+            "status": "online",
+            "mode": "ai",
+        }
+
+    except Exception:
+        return {
+            "status": "offline",
+            "mode": "offline_rules",
+        }

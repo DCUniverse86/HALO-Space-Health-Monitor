@@ -90,6 +90,13 @@ const astronautPath = (id: string) => `/astronauts/${encodeURIComponent(id)}`
 
 // API endpoints
 export const haloApi = {
+
+    aiStatus: () =>
+        request<{
+            status: 'online' | 'offline'
+            mode: 'ai' | 'offline_rules'
+        }>('/ai/status'),
+
     // Check FastAPI availability
     health: () => request<HealthResponse>('/health'),
 
