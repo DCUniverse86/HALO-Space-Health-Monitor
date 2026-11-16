@@ -106,7 +106,7 @@ app.add_exception_handler(
 )
 
 
-# Configure CORS for local development and Vercel.
+# HALO frontend CORS configuration.
 FRONTEND_URL = os.getenv(
     "HALO_FRONTEND_URL",
     "",
@@ -115,24 +115,23 @@ FRONTEND_URL = os.getenv(
 allowed_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://halo-space-health-monitor-5of7.vercel.app",
+    "https://halo-space-health-monitor-1sw6.vercel.app",
+    "https://halo-frontend-ecru.vercel.app",
+    "https://halo-frontend-4i4t6eckj-dgcarpenterjr-2220.vercel.app",
 ]
 
-if FRONTEND_URL:
+if FRONTEND_URL and FRONTEND_URL not in allowed_origins:
     allowed_origins.append(FRONTEND_URL)
 
 
+# Allow the configured HALO frontend origins.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=False,
-    allow_methods=[
-        "GET",
-        "POST",
-        "OPTIONS",
-    ],
-    allow_headers=[
-        "Content-Type",
-    ],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
 )
 
 
