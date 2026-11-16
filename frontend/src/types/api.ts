@@ -131,6 +131,7 @@ export interface AssistantSource {
 
 // Contains the assistant's guidance, sources, and disclaimer.
 export interface AssistantResponse {
+    mode: 'ai' | 'offline_rules'
     summary: string
     severity: Severity
     likely_causes: string[]
@@ -141,6 +142,7 @@ export interface AssistantResponse {
     sources: AssistantSource[]
     disclaimer: string
 }
+
 
 // Defines a request to escalate a health concern.
 export interface EscalationRequest {

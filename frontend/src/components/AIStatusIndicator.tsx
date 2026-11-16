@@ -5,19 +5,21 @@ interface AIStatusIndicatorProps {
     status: AIStatus
 }
 
-// Displays HALO's AI availability across all pages.
-function AIStatusIndicator({ status }: AIStatusIndicatorProps) {
+// Displays the last verified AI assistant mode.
+function AIStatusIndicator({
+    status,
+}: AIStatusIndicatorProps) {
     const statusConfig = {
         online: {
             label: 'AI Online',
             color: 'bg-[#4CC38A]',
         },
         offline: {
-            label: 'AI Offline',
-            color: 'bg-[#F03333]',
+            label: 'Offline Rules Mode',
+            color: 'bg-[#F0B429]',
         },
         unknown: {
-            label: 'AI Status unavailable',
+            label: 'AI Status Not Yet Checked',
             color: 'bg-gray-400',
         },
     }

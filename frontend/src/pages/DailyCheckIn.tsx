@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import type { CheckInRequest } from '../types/api'
 import { haloApi, ApiError } from '../api/client'
-import type { CheckInResponse } from '../types/api'
+import type {
+    CheckInRequest,
+    CheckInResponse,
+} from '../types/api'
 
 const symptomOptions = [
     'Fatigue',

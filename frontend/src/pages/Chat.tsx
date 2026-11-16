@@ -17,15 +17,22 @@ interface ChatProps {
     messages: ChatMessage[]
     onSendMessage: (message: string) => void
     onContactMedicalOfficer: () => void
+    astronautId: string
+    selectedDay: number
+    assistantLoading: boolean
+    aiStatus: 'online' | 'offline' | 'unknown'
 }
 
 // Displays HALO's Care Chat interface.
 function Chat({
     messages,
     onSendMessage,
-    onContactMedicalOfficer 
+    onContactMedicalOfficer,
+    astronautId,
+    selectedDay,
+    assistantLoading,
+    aiStatus,
 }: ChatProps) {
-
     const [messageInput, setMessageInput] = useState('')
     const [robotPose, setRobotPose] = useState<RobotPose>('waving')
     const [robotSeverity, setRobotSeverity] = useState<Severity | undefined>(undefined)
@@ -53,7 +60,8 @@ function Chat({
                 </h1>
 
                 <p className="mt-2 text-sm italic text-[#A8BDD6]">
-                    Commander Alex · Mission Day 75
+                    {astronautId.charAt(0).toUpperCase() + astronautId.slice(1)}
+                    {' · '}Mission Day {selectedDay}    
                 </p>
             </header>
 
@@ -75,7 +83,11 @@ function Chat({
                     </p>
 
                     <p className="mt-2 text-xs text-[#F0B429]">
-                        DEMO CHAT — AI responses unavailable
+                        {aiStatus === 'online'
+                            ? 'Gemini AI response verified'
+                            : aiStatus === 'offline'
+                                ? 'Offline rules assistant active'
+                                : 'Assistant mode not yet verified'}
                     </p>
                 </div>
             </section>
@@ -123,6 +135,7 @@ function Chat({
                     id="chatMessage"
                     type="text"
                     value={messageInput}
+                    disabled={assistantLoading}
                     onChange={(event) =>
                         setMessageInput(event.target.value)
                     }
@@ -132,7 +145,7 @@ function Chat({
 
                 <button
                     type="submit"
-                    disabled={!messageInput.trim()}
+                    disabled={!messageInput.trim() || assistantLoading}
                     aria-label="Send message"
                     className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#F0B429] text-[#102B4C] disabled:cursor-not-allowed disabled:opacity-50"
                 >
@@ -156,9 +169,11 @@ function Chat({
             </button>
 
             <p className="mt-5 text-center text-xs italic text-[#A8BDD6]">
-                Demonstration interface only. Messages are stored
-                in this browser session and are not sent to an AI
-                or medical professional.
+                Messages are sent to HALO's backend assistant and
+                retained in this browser session. Gemini is used
+                when available; otherwise, HALO may use its
+                offline rules fallback. Chat messages are not
+                automatically transmitted to a medical professional.
             </p>
 
             <p className="mt-2 text-center text-xs italic text-[#A8BDD6]">
