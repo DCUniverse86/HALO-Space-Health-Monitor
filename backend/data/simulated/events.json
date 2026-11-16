@@ -1,0 +1,63 @@
+{
+  "seed": 100,
+  "events": [
+    {
+      "code": "CARDIO_DRIFT",
+      "system": "cardiovascular",
+      "start_day": 40,
+      "end_day": 60,
+      "metrics": [
+        "rest_hr",
+        "hrv",
+        "sleep_h"
+      ],
+      "description": "Slow resting heart rate rise, HRV drop and poorer sleep."
+    },
+    {
+      "code": "POSSIBLE_INFECTION",
+      "system": "immune",
+      "start_day": 75,
+      "end_day": 80,
+      "metrics": [
+        "temp_c",
+        "rest_hr",
+        "fatigue"
+      ],
+      "description": "Fever with raised resting heart rate and fatigue."
+    },
+    {
+      "code": "BEHAVIORAL_DECLINE",
+      "system": "behavioral",
+      "start_day": 110,
+      "end_day": 125,
+      "metrics": [
+        "mood",
+        "sleep_h",
+        "social_h"
+      ],
+      "description": "Gradual mood decline, shorter sleep and social withdrawal."
+    },
+    {
+      "code": "CO2_HEADACHE",
+      "system": "environment",
+      "start_day": 130,
+      "end_day": 136,
+      "metrics": [
+        "co2_ppm",
+        "headache"
+      ],
+      "description": "Cabin CO2 buildup with headaches across the crew."
+    },
+    {
+      "code": "SKIPPED_EXERCISE",
+      "system": "musculoskeletal",
+      "start_day": 150,
+      "end_day": 157,
+      "metrics": [
+        "exercise_min",
+        "back_pain"
+      ],
+      "description": "A week of skipped exercise with back pain."
+    }
+  ]
+}
