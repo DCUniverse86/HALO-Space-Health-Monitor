@@ -1,0 +1,96 @@
+# HALO detection thresholds.
+#
+# PROTOTYPE VALUES, NOT CLINICAL VALUES. They were tuned on simulated crew data
+# so that all five injected events are caught with few false alarms.
+#
+# Every rule and red line has a `source` field. `null` means it still needs a
+# citation in docs/references.md (Roman + Viktoriia). Do not hard-code these
+# numbers anywhere else: the detection code reads them from this file.
+
+version: 1
+
+baseline:
+  # Pre-flight days (day < 0) used for each astronaut's personal normal.
+  min_preflight_days: 14
+  # Converts the median absolute deviation to a standard-deviation-like spread.
+  mad_to_sd: 1.4826
+  # Floor on each metric's spread, so an unusually steady pre-flight period
+  # cannot make ordinary day-to-day noise look like a huge deviation.
+  min_scale:
+    rest_hr: 1.0       # bpm
+    hrv: 2.0           # ms
+    sleep_h: 0.2       # hours
+    temp_c: 0.1        # C
+    spo2: 0.5          # percent
+    mood: 0.3          # 1-10 scale
+    social_h: 0.25     # hours
+    co2_ppm: 30        # ppm
+    exercise_min: 5    # minutes
+    fatigue: 0.3       # 0-10 scale
+    back_pain: 0.3     # 0-10 scale
+
+# Per-metric severity: how far one reading is from the personal baseline, in
+# the direction that is concerning for that metric (for example HR up, HRV down).
+metric_severity:
+  yellow_z: 2.0
+  red_z: 3.0
+  source: null
+
+smoothing:
+  ewma_alpha: 0.3          # weight of today in the exponentially weighted average
+  cusum_k: 0.5             # drift allowance per day, in z units
+  cusum_window_days: 14    # CUSUM only looks back this far, so old events fade out
+
+# Hard red lines. Any one of them makes the system and overall status RED and
+# requires escalation, whatever the rules or the AI assistant say.
+red_lines:
+  spo2_min:
+    value: 92.0
+    unit: percent
+    system: cardiovascular
+    source: null
+  temp_max_c:
+    value: 39.0
+    unit: C
+    system: immune
+    source: null
+  critical_symptoms:
+    # symptom code reported in a check-in -> body system it is shown under
+    chest_pain: cardiovascular
+    loss_of_consciousness: cardiovascular
+    severe_bleeding: cardiovascular
+  critical_symptoms_source: null
+
+# Multi-signal rules. Each one raises a YELLOW flag on its body system.
+# z values are measured in the concerning direction for the metric.
+rules:
+  cardio_drift:
+    # Resting HR raised (smoothed) or drifting upward (CUSUM)...
+    rest_hr_ewma_z: 1.5
+    rest_hr_cusum: 5.0
+    # The CUSUM path only counts while HR is still somewhat raised, so a drift
+    # that has ended does not keep the flag on for the rest of the CUSUM window.
+    cusum_min_ewma_z: 1.0
+    # ...and backed up by lower HRV or shorter sleep (smoothed).
+    support_ewma_z: 1.0
+    source: null
+  infection:
+    rest_hr_z: 2.0
+    temp_z: 3.0
+    fatigue_min: 5.0     # 0-10 self-reported fatigue
+    source: null
+  behavioral:
+    # Mood down (smoothed), backed up by shorter sleep or less social time.
+    mood_ewma_z: 1.5
+    support_ewma_z: 1.0
+    source: null
+  environment:
+    co2_ppm_max: 2000    # cabin CO2 above this is flagged for the whole crew
+    min_crew_headaches: 2  # with this many crew reporting headaches the same day
+    source: null
+  musculoskeletal:
+    exercise_min_floor: 60   # minutes; a day below this counts as a skipped workout
+    window_days: 7
+    low_days: 3              # skipped workouts within the window to raise a flag
+    back_pain_z: 2.0         # mentioned in the explanation when also raised
+    source: null
