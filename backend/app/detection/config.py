@@ -1,4 +1,5 @@
-"""Load detection thresholds from data/config/thresholds.yaml."""
+
+"""Load HALO detection thresholds."""
 
 from __future__ import annotations
 
@@ -8,19 +9,37 @@ from typing import Any
 
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_THRESHOLDS_PATH = REPO_ROOT / "data" / "config" / "thresholds.yaml"
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = BACKEND_ROOT.parent
+
+PACKAGED_THRESHOLDS_PATH = (
+    BACKEND_ROOT / "data" / "config" / "thresholds.yaml"
+)
+
+REPOSITORY_THRESHOLDS_PATH = (
+    REPO_ROOT / "data" / "config" / "thresholds.yaml"
+)
+
+DEFAULT_THRESHOLDS_PATH = (
+    PACKAGED_THRESHOLDS_PATH
+    if PACKAGED_THRESHOLDS_PATH.is_file()
+    else REPOSITORY_THRESHOLDS_PATH
+)
 
 Thresholds = dict[str, Any]
 
 
 def load_thresholds(path: Path | None = None) -> Thresholds:
-    """Read and return the thresholds file as a plain dict."""
-    with open(path or DEFAULT_THRESHOLDS_PATH, encoding="utf-8") as f:
-        return yaml.safe_load(f)
+    """Read and return the configured thresholds."""
+    selected_path = (
+        path if path is not None else DEFAULT_THRESHOLDS_PATH
+    )
+
+    with open(selected_path, encoding="utf-8") as file:
+        return yaml.safe_load(file)
 
 
 @lru_cache(maxsize=1)
 def default_thresholds() -> Thresholds:
-    """The repo's thresholds file, read once per process."""
+    """Load default thresholds once per process."""
     return load_thresholds()
