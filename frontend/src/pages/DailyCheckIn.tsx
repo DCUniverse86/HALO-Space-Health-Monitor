@@ -1,10 +1,14 @@
+
 import { useState } from 'react'
 import { haloApi, ApiError } from '../api/client'
 import type {
     CheckInRequest,
     CheckInResponse,
+    Severity,
 } from '../types/api'
+import AssessmentResults from '../components/AssessmentResults'
 
+// Available symptom and sleep-duration options.
 const symptomOptions = [
     'Fatigue',
     'Headache',
@@ -54,36 +58,25 @@ const inputStyle =
 const cardStyle =
     'rounded-[20px] border border-[#31577D]/40 bg-linear-to-b from-[#214E85] to-[#173C70] p-4 shadow-lg'
 
-// Identifies the astronaut and mission day selected in HALO.
 interface DailyCheckInProps {
     astronautId: string
     selectedDay: number
 }
 
-// Displays HALO's three-step Daily Check-In.
+// HALO's three-step astronaut wellness check-in.
 function DailyCheckIn({
     astronautId,
     selectedDay,
 }: DailyCheckInProps) {
+    const [currentStep, setCurrentStep] = useState(1)
+
+    // Step 1: Wellness information.
     const [formData, setFormData] =
         useState<Partial<CheckInRequest>>({})
 
     const [selectedSleep, setSelectedSleep] =
         useState<string | null>(null)
 
-	// Track which step of Daily Check-In is displayed.
-    const [currentStep, setCurrentStep] = useState<number>(1)
-
-        // Track real backend check-in submissions.
-    const [checkInResult, setCheckInResult] =
-        useState<CheckInResponse | null>(null)
-
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const [submissionError, setSubmissionError] =
-        useState<string | null>(null)
-
-    // Additional wellness questions required by Donte's API.
     const [sleepQuality, setSleepQuality] =
         useState<number | null>(null)
 
@@ -99,16 +92,33 @@ function DailyCheckIn({
     const [painLocation, setPainLocation] = useState('')
     const [notes, setNotes] = useState('')
 
-    // Local vital-sign entry state.
+    // Step 2: Optional local vital measurements.
     const [measurementContext, setMeasurementContext] =
         useState<'resting' | 'after_activity'>('resting')
 
     const [recordedAt, setRecordedAt] = useState('')
 
     const [vitals, setVitals] =
-        useState<Vitals>(initialVitals)
+        useState<Vitals>({ ...initialVitals })
 
     const [readingsSaved, setReadingsSaved] = useState(false)
+
+    // Backend check-in submission state.
+    const [checkInResult, setCheckInResult] =
+        useState<CheckInResponse | null>(null)
+
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
+    const [submissionError, setSubmissionError] =
+        useState<string | null>(null)
+
+    // Controls fictional assessment card previews only.
+    const [previewSeverity, setPreviewSeverity] =
+        useState<Severity | null>(null)
+
+    const astronautName =
+        astronautId.charAt(0).toUpperCase() +
+        astronautId.slice(1)
 
     const updateMood = (mood: number) => {
         setFormData((previous) => ({
@@ -185,7 +195,7 @@ function DailyCheckIn({
                 Number(vitals.diastolic)
         )
 
-    // Require all wellness questions before continuing.
+    // Require the backend's wellness fields.
     const isStepOneComplete =
         selectedSleep !== null &&
         formData.mood != null &&
@@ -199,8 +209,7 @@ function DailyCheckIn({
             painLocation.trim().length > 0
         )
 
-    
-    // Submit wellness answers to Donte's FastAPI backend.
+    // Send wellness information to Donte's FastAPI endpoint.
     const submitCheckIn = async () => {
         if (
             !isStepOneComplete ||
@@ -209,14 +218,14 @@ function DailyCheckIn({
             stress === null ||
             fatigue === null ||
             painLevel === null ||
+            !areVitalsValid ||
             isSubmitting ||
             checkInResult !== null
         ) {
             return
         }
 
-        // Donte's endpoint accepts wellness information only.
-        // Step 2 vital readings are not included in this request.
+        // Vital readings are not supported by this endpoint.
         const requestData: CheckInRequest = {
             day: selectedDay,
             sleep_quality: sleepQuality,
@@ -253,6 +262,7 @@ function DailyCheckIn({
             }
 
             setCheckInResult(response)
+            setPreviewSeverity(null)
             setCurrentStep(3)
         } catch (error: unknown) {
             if (
@@ -274,8 +284,7 @@ function DailyCheckIn({
         }
     }
 
-	
-		// Reset the local demonstration after completion.
+    // Reset all form and preview state.
     const finishCheckIn = () => {
         setCurrentStep(1)
         setFormData({})
@@ -290,8 +299,9 @@ function DailyCheckIn({
         setMeasurementContext('resting')
         setRecordedAt('')
         setReadingsSaved(false)
-		setCheckInResult(null)
-		setSubmissionError(null)
+        setCheckInResult(null)
+        setSubmissionError(null)
+        setPreviewSeverity(null)
     }
 
     // Shared numbered rating buttons.
@@ -319,7 +329,7 @@ function DailyCheckIn({
         </div>
     )
 
-    // Shared vital-sign input rows.
+    // Shared optional vital-sign input rows.
     const vitalRow = (
         field: VitalKey,
         label: string,
@@ -592,6 +602,7 @@ function DailyCheckIn({
                             <button
                                 type="button"
                                 onClick={() => setCurrentStep(1)}
+                                disabled={isSubmitting}
                                 aria-label="Back to daily check-in"
                                 className="flex h-8 w-7 items-center justify-center text-2xl text-white"
                             >
@@ -603,7 +614,7 @@ function DailyCheckIn({
                             </h1>
                         </div>
 
-                        {/* Preserve the existing HALO robot badge. */}
+                        {/* Preserve the HALO robot badge. */}
                         <div
                             aria-hidden="true"
                             className="absolute right-0 top-0 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#8DA9C9] bg-[#DCE7F4] shadow-md"
@@ -616,7 +627,7 @@ function DailyCheckIn({
                         </div>
 
                         <p className="mt-3 text-sm italic text-[#B9C9DD]">
-                            {astronautId.charAt(0).toUpperCase() + astronautId.slice(1)} · Mission day {selectedDay}
+                            {astronautName} · Mission day {selectedDay}
                         </p>
 
                         <p className="mt-1 text-sm text-[#B9C9DD]">
@@ -624,7 +635,7 @@ function DailyCheckIn({
                         </p>
 
                         <span className="mt-2 inline-block rounded-full border border-[#7895B7] px-2 py-0.5 text-[10px] tracking-[0.12em] text-[#B9C9DD]">
-                            DEMO ENTRY
+                            OPTIONAL LOCAL ENTRY
                         </span>
                     </header>
 
@@ -799,6 +810,8 @@ function DailyCheckIn({
 
                                 <p className="mt-2 text-xs italic text-[#B9C9DD]">
                                     Leave unavailable readings blank.
+                                    These measurements are optional
+                                    and are not submitted to the backend.
                                 </p>
                             </section>
 
@@ -811,33 +824,35 @@ function DailyCheckIn({
                                 }
                                 className="mt-3 w-full rounded-full bg-linear-to-b from-[#FFE47B] to-[#F0B429] px-4 py-3 text-lg font-bold text-[#102B4C] shadow-[0_3px_0_#A77A17] disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                Save readings
+                                Save Readings Locally
                             </button>
+
+                            {readingsSaved && (
+                                <p
+                                    role="status"
+                                    className="mt-2 text-center text-xs text-[#B9C9DD]"
+                                >
+                                    Readings retained in this
+                                    browser session only.
+                                    Not submitted to the backend.
+                                </p>
+                            )}
 
                             <button
                                 type="button"
-                                onClick={() => setCurrentStep(1)}
-                                className="mt-3 w-full py-1 text-center text-sm text-[#B9C9DD]"
+                                onClick={submitCheckIn}
+                                disabled={
+                                    isSubmitting ||
+                                    checkInResult !== null ||
+                                    !isStepOneComplete ||
+                                    !areVitalsValid
+                                }
+                                className="mt-4 w-full rounded-full bg-[#F0B429] px-4 py-3 font-bold text-[#102B4C] hover:bg-[#FFD166] disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                Cancel
+                                {isSubmitting
+                                    ? 'Submitting Check-In...'
+                                    : 'Submit Daily Check-In'}
                             </button>
-
-                            
-                            {readingsSaved && (
-                                <button
-                                    type="button"
-                                    onClick={submitCheckIn}
-                                    disabled={
-                                        isSubmitting ||
-                                        checkInResult !== null
-                                    }
-                                    className="mt-3 w-full rounded-full bg-[#F0B429] px-4 py-3 font-bold text-[#102B4C] hover:bg-[#FFD166] disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    {isSubmitting
-                                        ? 'Submitting Check-In...'
-                                        : 'Submit Daily Check-In'}
-                                </button>
-                            )}
 
                             {submissionError && (
                                 <p
@@ -848,46 +863,35 @@ function DailyCheckIn({
                                 </p>
                             )}
 
-
-								{submissionError && (
-    							<p
-        							role="alert"
-        							className="mt-3 text-center text-sm text-[#FF6472]"
-    							>
-        							{submissionError}
-    							</p>
-							)}
-
-                            {readingsSaved && (
-                                <p
-                                    role="status"
-                                    className="mt-2 text-center text-xs text-[#B9C9DD]"
-                                >
-                                    Readings retained in this session only.
-                                    Not submitted to the backend.
-                                </p>
-                            )}
+                            <button
+                                type="button"
+                                onClick={() => setCurrentStep(1)}
+                                disabled={isSubmitting}
+                                className="mt-3 w-full py-1 text-center text-sm text-[#B9C9DD]"
+                            >
+                                Back to Wellness Questions
+                            </button>
 
                             <p className="mt-3 text-center text-xs italic text-[#B9C9DD]">
-                                Decision support prototype. Not a medical device.
+                                Decision support prototype.
+                                Not a medical device.
                             </p>
                         </div>
                     </div>
                 </>
             )}
 
-            
-            {/* STEP 3 — BACKEND CHECK-IN CONFIRMATION */}
+            {/* STEP 3 — BACKEND CONFIRMATION AND DESIGN PREVIEW */}
             {currentStep === 3 && checkInResult && (
                 <section className="mx-auto w-full max-w-4xl text-white">
+                    {/* Real backend confirmation */}
                     <div className="rounded-2xl bg-linear-to-b from-[#24538B] to-[#173A6B] p-6 shadow-lg">
                         <h1 className="text-2xl font-bold">
                             Daily Check-In Submitted
                         </h1>
 
                         <p className="mt-3 text-sm text-[#C4D4E6]">
-                            {astronautId.charAt(0).toUpperCase() +
-                                astronautId.slice(1)}
+                            {astronautName}
                             {' · '}Mission Day {checkInResult.day}
                         </p>
 
@@ -916,10 +920,9 @@ function DailyCheckIn({
 
                             {checkInResult.new_flags.length === 0 ? (
                                 <p className="mt-3 text-sm text-[#C4D4E6]">
-                                    No additional health flags were
-                                    returned for this check-in.
-                                    This does not establish an
-                                    overall GREEN assessment.
+                                    No health flags were returned for
+                                    this check-in. This does not
+                                    establish an overall GREEN assessment.
                                 </p>
                             ) : (
                                 <div className="mt-4 space-y-3">
@@ -950,20 +953,76 @@ function DailyCheckIn({
                         </div>
 
                         <p className="mt-5 text-xs italic text-[#C4D4E6]">
-                            Health flags are generated by HALO's
-                            backend detection engine. Entered vital
-                            readings are not included in this
-                            submission.
+                            Health flags are supplied by HALO's
+                            backend detection engine. Entered
+                            vital measurements are not included
+                            in this submission.
+                        </p>
+                    </div>
+
+                    {/* Assessment preview selection buttons */}
+                    <div className="mt-6 rounded-2xl bg-[#173A6B] p-4 shadow-lg">
+                        <h2 className="text-xl font-bold">
+                            Assessment Design Preview
+                        </h2>
+
+                        <p className="mt-2 text-sm text-[#C4D4E6]">
+                            Select GREEN, YELLOW, or RED to preview
+                            HALO's original assessment card designs.
+                            These are fictional scenarios and do not
+                            change your saved check-in or backend
+                            health assessment.
                         </p>
 
-                        <button
-                            type="button"
-                            onClick={finishCheckIn}
-                            className="mt-6 w-full rounded-xl bg-[#F0B429] px-6 py-3 font-bold text-[#102B4C] hover:bg-[#FFD166]"
-                        >
-                            Done
-                        </button>
+                        <div className="mt-4 flex flex-wrap gap-3">
+                            {(['GREEN', 'YELLOW', 'RED'] as const).map(
+                                (severity) => (
+                                    <button
+                                        key={severity}
+                                        type="button"
+                                        onClick={() =>
+                                            setPreviewSeverity(severity)
+                                        }
+                                        aria-pressed={
+                                            previewSeverity === severity
+                                        }
+                                        className={`rounded-xl border px-5 py-3 font-semibold transition-colors ${
+                                            previewSeverity === severity
+                                                ? 'border-[#F0B429] bg-[#F0B429] text-[#102B4C]'
+                                                : 'border-[#A8BDD6] bg-[#1F4A85] text-white'
+                                        }`}
+                                    >
+                                        {severity}
+                                    </button>
+                                )
+                            )}
+                        </div>
                     </div>
+
+                    {/* Fictional assessment card previews */}
+                    {previewSeverity && (
+                        <div className="mt-6">
+                            <p className="mb-4 text-center text-sm font-semibold text-[#F0B429]">
+                                FICTIONAL DESIGN PREVIEW —
+                                NOT YOUR SUBMITTED ASSESSMENT
+                            </p>
+
+                            <AssessmentResults
+                                severity={previewSeverity}
+                                onDone={() =>
+                                    setPreviewSeverity(null)
+                                }
+                            />
+                        </div>
+                    )}
+
+                    <button
+                        type="button"
+                        onClick={finishCheckIn}
+                        className="mt-6 w-full rounded-xl bg-[#F0B429] px-6 py-3 font-bold text-[#102B4C] hover:bg-[#FFD166]"
+                    >
+                        Finish Daily Check-In
+                    </button>
 
                     <p className="mt-5 text-center text-xs italic text-[#C4D4E6]">
                         HALO is a decision-support research prototype,
