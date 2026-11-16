@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { haloApi } from './api/client'
+import type { Astronaut } from './types/api'
 import Dashboard from './pages/Dashboard'
 import BottomNav from './components/BottomNav'
 import type { NavPage } from './components/BottomNav'
@@ -18,6 +19,61 @@ import BackendStatusIndicator from './components/BackendStatusIndicator'
 function App() {
     // Track which HALO page is currently selected.
     const [activePage, setActivePage] = useState<NavPage>('home')
+
+
+    // Store the selected mission day across HALO pages.
+    // Mission days range from 0 through 179.
+    const [selectedDay, setSelectedDay] = useState<number>(75)
+
+
+
+    // Store the astronauts available from the FastAPI backend.
+    const [astronauts, setAstronauts] = useState<Astronaut[]>([])
+
+    // Keep the selected astronaut available across HALO pages.
+    const [selectedAstronautId, setSelectedAstronautId] =
+        useState<string>('alex')
+
+    // Track astronaut list loading and connection errors.
+    const [astronautsLoading, setAstronautsLoading] = useState(true)
+    const [astronautsError, setAstronautsError] =
+        useState<string | null>(null)
+
+    // Retrieve the available astronauts from Roman's backend.
+    useEffect(() => {
+        let active = true
+
+        haloApi.astronauts()
+            .then((data) => {
+                if (!active) {
+                    return
+                }
+
+                setAstronauts(data.astronauts)
+                setAstronautsError(null)
+            })
+            .catch((error: unknown) => {
+                if (!active) {
+                    return
+                }
+
+                setAstronautsError(
+                    error instanceof Error
+                        ? error.message
+                        : 'Unable to load astronaut profiles.'
+                )
+            })
+            .finally(() => {
+                if (active) {
+                    setAstronautsLoading(false)
+                }
+            })
+
+        return () => {
+            active = false
+        }
+    }, [])
+
 
     // Preserve demo chat messages while navigating HALO.
     const [chatMessages, setChatMessages] =
@@ -87,14 +143,26 @@ function App() {
                     {activePage === 'home' ? (
                     <Dashboard
                         onStartCheckIn={() => setActivePage('checkin')}
-                />
+                        astronautId={selectedAstronautId}
+                        selectedDay={selectedDay}
+                        onSelectDay={setSelectedDay}
+                    />
 
                 ) : activePage === 'vitals' ? (
-                    <Vitals />
+                    <Vitals
+                        astronautId={selectedAstronautId}
+                        selectedDay={selectedDay}
+                    /> 
                 ) : activePage === 'checkin' ? (
-                    <DailyCheckIn />
+                    <DailyCheckIn
+                        astronautId={selectedAstronautId}
+                        selectedDay={selectedDay}
+                    />
                 ) : activePage === 'trends' ? (
-                    <Trends />
+                    <Trends
+                        astronautId={selectedAstronautId}
+                        selectedDay={selectedDay}
+                        />
                 ) : activePage === 'chat' ? (
                     <Chat
                         messages={chatMessages}
@@ -104,7 +172,14 @@ function App() {
                         }
                     />
                 ) : activePage === 'profile' ? (
-                    <Profile />
+                    <Profile 
+                        astronauts={astronauts}
+                        selectedAstronautId={selectedAstronautId}
+                        selectedDay={selectedDay}
+                        onSelectAstronaut={setSelectedAstronautId}
+                        isLoading={astronautsLoading}
+                        error={astronautsError}
+                    />
                 ) : activePage === 'escalation' ? (
                     <Escalation onBack={() => setActivePage('chat')}/>
                 ) : null}
