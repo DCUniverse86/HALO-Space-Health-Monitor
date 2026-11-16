@@ -52,7 +52,7 @@ function DashboardHeader({
                     
                     {/* Display health status and AI assessment beside HALO */}
                     <div className="min-w-0 flex-1 space-y-3">
-                        <span className={`text-2xl font-bold sm:text-3xl${severityColor}`}>
+                        <span className={`text-2xl font-bold sm:text-3xl ${severityColor}`}>
                             {overallSeverity ?? "Unavailable"}
                         </span>
 
@@ -71,4 +71,3 @@ function DashboardHeader({
         )
     }
 export default DashboardHeader
-
